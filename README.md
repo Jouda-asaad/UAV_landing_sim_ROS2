@@ -1,5 +1,19 @@
 # Omnibase - Autonomous Drone Landing Platform
 
+<div align="center">
+
+![ROS2](https://img.shields.io/badge/ROS2-Jazzy-22314E?style=for-the-badge&logo=ros&logoColor=white)
+![Gazebo](https://img.shields.io/badge/Gazebo-Harmonic-F58220?style=for-the-badge&logo=gazebo&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![OpenCV](https://img.shields.io/badge/OpenCV-4.x-5C3EE8?style=for-the-badge&logo=opencv&logoColor=white)
+![Ubuntu](https://img.shields.io/badge/Ubuntu-24.04-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)
+
+[Quick Start](#quick-start) • [Features](#features) • [Drone Control GUI](#drone-control-gui) • [Architecture](#architecture) • [Packages](#packages) • [Topics](#topics) • [Tuning](#tuning) • [Troubleshooting](#troubleshooting) • [Dependencies](#dependencies)
+
+</div>
+
+---
+
 A ROS2 Jazzy + Gazebo Harmonic simulation of a mecanum wheel base that autonomously tracks and catches a UAV using vision-based control.
 
 ## Quick Start
@@ -40,44 +54,68 @@ source install/setup.bash
 
 ## Architecture
 
-```
-┌─────────────┐     /uav/cmd_vel      ┌─────────┐
-│  Drone GUI  │ ─────────────────────▶│   UAV   │
-└─────────────┘                       └────┬────┘
-       │                                   │
-       │ /landing_status              LED visible
-       ▼                                   ▼
-┌─────────────┐     /led_centroid    ┌───────────┐
-│Base Tracker │◀─────────────────────│LED Detect │
-└──────┬──────┘                      └─────┬─────┘
-       │                                   │
-       │ /cmd_vel                   /camera/image_raw
-       ▼                                   │
-┌─────────────┐                      ┌─────┴─────┐
-│   Omnibase  │◀─────────────────────│  Camera   │
-└─────────────┘                      └───────────┘
+```mermaid
+flowchart TB
+    subgraph Control["🎮 Control Layer"]
+        GUI["Drone GUI"]
+    end
+    
+    subgraph Robot["🤖 Robot Layer"]
+        UAV["UAV"]
+        BASE["Omnibase"]
+    end
+    
+    subgraph Vision["👁️ Vision Layer"]
+        LED["LED Detector"]
+        TRACKER["Base Tracker"]
+        CAM["Camera"]
+    end
+    
+    GUI -->|"/uav/cmd_vel"| UAV
+    GUI -->|"/landing_status"| TRACKER
+    UAV -.->|"LED visible"| LED
+    CAM -->|"/camera/image_raw"| LED
+    LED -->|"/led_centroid"| TRACKER
+    TRACKER -->|"/cmd_vel"| BASE
+    CAM -.-> BASE
 ```
 
 ## Packages
 
-| Package | Description |
-|---------|-------------|
-| `omnibase_description` | URDF with mecanum wheels + camera |
-| `omnibase_gazebo` | Gazebo world, models, ROS-GZ bridge |
-| `omnibase_control` | Drone GUI, controllers |
-| `omnibase_vision` | LED detector, base tracker |
-| `omnibase_bringup` | Launch files |
+```mermaid
+mindmap
+  root((📦 Packages))
+    omnibase_description
+      URDF with mecanum wheels + camera
+    omnibase_gazebo
+      Gazebo world, models, ROS-GZ bridge
+    omnibase_control
+      Drone GUI, controllers
+    omnibase_vision
+      LED detector, base tracker
+    omnibase_bringup
+      Launch files
+```
 
 ## Topics
 
-| Topic | Type | Description |
-|-------|------|-------------|
-| `/cmd_vel` | Twist | Base velocity (via VelocityControl plugin) |
-| `/uav/cmd_vel` | Twist | UAV velocity commands |
-| `/camera/image_raw` | Image | Upward camera feed |
-| `/camera/debug` | Image | Camera with LED overlay |
-| `/led_centroid` | Point | LED position (x, y) + area (z) |
-| `/landing_status` | Bool | True when landing mode active |
+```mermaid
+flowchart LR
+    subgraph Twist["🔄 Twist"]
+        CMD["/cmd_vel\nBase velocity"]
+        UAV["/uav/cmd_vel\nUAV commands"]
+    end
+    
+    subgraph Image["📷 Image"]
+        RAW["/camera/image_raw\nUpward camera feed"]
+        DBG["/camera/debug\nLED overlay"]
+    end
+    
+    subgraph Data["📊 Data"]
+        LED["/led_centroid\nPoint: x, y, area"]
+        LAND["/landing_status\nBool: landing mode"]
+    end
+```
 
 ## Tuning
 
@@ -98,12 +136,27 @@ source install/setup.bash
 
 ## Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| Gazebo crashes | Run with NVIDIA EGL: `export __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/10_nvidia.json` |
-| Base doesn't move | Check `/cmd_vel` topic, verify VelocityControl plugin in URDF |
-| LED not detected | View `/camera/debug`, adjust brightness_threshold |
-| Base jitters | Increase deadband, decrease gains |
+```mermaid
+flowchart LR
+    subgraph Issues["⚠️ Common Issues"]
+        I1["Gazebo crashes"]
+        I2["Base doesn't move"]
+        I3["LED not detected"]
+        I4["Base jitters"]
+    end
+    
+    subgraph Solutions["✅ Solutions"]
+        S1["Set NVIDIA EGL:\nexport __EGL_VENDOR_LIBRARY_FILENAMES=\n.../10_nvidia.json"]
+        S2["Check /cmd_vel topic\nVerify VelocityControl plugin"]
+        S3["View /camera/debug\nAdjust brightness_threshold"]
+        S4["Increase deadband\nDecrease gains"]
+    end
+    
+    I1 --> S1
+    I2 --> S2
+    I3 --> S3
+    I4 --> S4
+```
 
 ## Dependencies
 
