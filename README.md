@@ -8,7 +8,7 @@
 ![OpenCV](https://img.shields.io/badge/OpenCV-4.x-5C3EE8?style=for-the-badge&logo=opencv&logoColor=white)
 ![Ubuntu](https://img.shields.io/badge/Ubuntu-24.04-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)
 
-[Quick Start](#quick-start) • [Features](#features) • [Drone Control GUI](#drone-control-gui) • [Architecture](#architecture) • [Packages](#packages) • [Topics](#topics) • [Tuning](#tuning) • [Troubleshooting](#troubleshooting) • [Dependencies](#dependencies)
+[Quick Start](#quick-start) • [Files](#files) • [Features](#features) • [Drone Control GUI](#drone-control-gui) • [Architecture](#architecture) • [Packages](#packages) • [Topics](#topics) • [Tuning](#tuning) • [Troubleshooting](#troubleshooting) • [Dependencies](#dependencies)
 
 </div>
 
@@ -24,9 +24,19 @@ cd ~/omnibase_ws
 colcon build --symlink-install
 source install/setup.bash
 
-# Run
+# install deps and sim run
 ./launch_simulation.sh
 ```
+
+## Files
+
+| File | Description |
+|------|-------------|
+| [launch_simulation.sh](launch_simulation.sh) | Main launch script with auto dependency check |
+| [omnibase.urdf.xacro](src/omnibase_description/urdf/omnibase.urdf.xacro) | Robot URDF model |
+| [tracking_world.sdf](src/omnibase_gazebo/worlds/tracking_world.sdf) | Gazebo simulation world |
+| [base_tracker.py](src/omnibase_vision/omnibase_vision/base_tracker.py) | Vision-based tracking logic |
+| [drone_gui.py](src/omnibase_control/omnibase_control/drone_gui.py) | Drone control interface |
 
 ## Features
 
@@ -147,14 +157,23 @@ flowchart LR
 > [!TIP]
 > The [launch script](launch_simulation.sh) **automatically checks and installs** missing dependencies on first run. Just run `./launch_simulation.sh` and it will prompt you to install any missing packages.
 
+### Dependencies by Package
+
+| Package | Required ROS2 Packages |
+|---------|------------------------|
+| `omnibase_description` | `robot-state-publisher`, `xacro`, `gz-ros2-control`, `ros2-controllers`, `mecanum-drive-controller` |
+| `omnibase_gazebo` | `ros-gz-sim`, `ros-gz-bridge`, `ros-gz-image` |
+| `omnibase_vision` | `cv-bridge`, Python: `opencv` |
+| `omnibase_control` | Core ROS2 packages (included in base install) |
+
 ### Manual Install (Optional)
 ```bash
-<<<<<<< HEAD
 sudo apt install ros-jazzy-ros-gz ros-jazzy-cv-bridge \
   ros-jazzy-image-transport ros-jazzy-xacro ros-jazzy-rqt-image-view \
   ros-jazzy-ros2-control ros-jazzy-ros2-controllers \
   ros-jazzy-controller-manager ros-jazzy-gazebo-ros2-control \
-=======
+```
+```bash
 sudo apt install -y \
   ros-jazzy-ros-gz \
   ros-jazzy-ros-gz-sim \
@@ -169,25 +188,6 @@ sudo apt install -y \
   ros-jazzy-gz-ros2-control \
   ros-jazzy-robot-state-publisher \
   ros-jazzy-mecanum-drive-controller \
-  python3-opencv
->>>>>>> 8d918e2 (better launch steps)
+  python3-opencv \
 ```
 
-### Dependencies by Package
-
-| Package | Required ROS2 Packages |
-|---------|------------------------|
-| `omnibase_description` | `robot-state-publisher`, `xacro`, `gz-ros2-control`, `ros2-controllers`, `mecanum-drive-controller` |
-| `omnibase_gazebo` | `ros-gz-sim`, `ros-gz-bridge`, `ros-gz-image` |
-| `omnibase_vision` | `cv-bridge`, Python: `opencv` |
-| `omnibase_control` | Core ROS2 packages (included in base install) |
-
-## Files
-
-| File | Description |
-|------|-------------|
-| [launch_simulation.sh](launch_simulation.sh) | Main launch script with auto dependency check |
-| [omnibase.urdf.xacro](src/omnibase_description/urdf/omnibase.urdf.xacro) | Robot URDF model |
-| [tracking_world.sdf](src/omnibase_gazebo/worlds/tracking_world.sdf) | Gazebo simulation world |
-| [base_tracker.py](src/omnibase_vision/omnibase_vision/base_tracker.py) | Vision-based tracking logic |
-| [drone_gui.py](src/omnibase_control/omnibase_control/drone_gui.py) | Drone control interface |
