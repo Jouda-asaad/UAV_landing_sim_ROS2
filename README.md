@@ -146,7 +146,9 @@ flowchart LR
 
 ```bash
 sudo apt install ros-jazzy-ros-gz ros-jazzy-cv-bridge \
-  ros-jazzy-image-transport ros-jazzy-xacro ros-jazzy-rqt-image-view
+  ros-jazzy-image-transport ros-jazzy-xacro ros-jazzy-rqt-image-view \
+  ros-jazzy-ros2-control ros-jazzy-ros2-controllers \
+  ros-jazzy-controller-manager ros-jazzy-gazebo-ros2-control \
 ```
 
 ## Files
